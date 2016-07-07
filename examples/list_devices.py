@@ -12,4 +12,4 @@ home = Home(user)
 
 for room in home.rooms:
     print(room.name)
-    print(room.power)
+    room.power = True

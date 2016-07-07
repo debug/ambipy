@@ -3,9 +3,12 @@ import json
 import requests
 from requests.auth import HTTPDigestAuth
 from rooms import Room
+from constants import REST_URL
 
-REST_URL = "https://rest.ambiclimate.com"
 DEBUG = False
+
+# TODO switch to constants
+# TODO auth file
 
 def log(msg):
     if DEBUG:
@@ -39,7 +42,7 @@ class Home(object):
         log(queryStr)
         response = requests.get(queryStr, headers=self.__headers, verify=False)
         for device in response.json()['devices']:
-            roomObj = Room(device)
+            roomObj = Room(device, self.__headers)
             roomsList.append(roomObj)
         return roomsList
 
