@@ -32,8 +32,6 @@ class Home(object):
             # TODO throw error
             pass
 
-        #{u'user_id': u'4f4024f3-67d9-43ab-a7b3-841ae240034b', u'expires_in': 86400, u'ttype': u'Bearer', u'last_activity': u'2016-07-07T05:39:23+00:00', u'created_on': u'2016-07-07T05:39:23+00:00', u'token_id': u'4866fac0-4b3c-4898-8ef7-c262d71e3b3c', u'scope': u'?'}
-
     @property
     def rooms(self):
         roomsList = []
