@@ -11,5 +11,8 @@ user = User()
 home = Home(user)
 
 for room in home.rooms:
-    print(room.name)
-    room.power = True
+    room.power = False
+    print("Mode >>", room.mode)
+    print("Power >>", room.power)
+    print("Temp >>", room.temperature)
+    print("Fan >>", room.fan)

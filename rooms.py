@@ -1,6 +1,7 @@
 from constants import REST_URL
 import requests
 
+# TODO change to emum model
 '''
 https://rest.ambiclimate.com/IrDeployment
 button: power
@@ -24,18 +25,20 @@ class Fan(object):
 class Room(object):
     def __init__(self, rawDeviceData, headers):
         self.__deviceDict = rawDeviceData
+
+        print(self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')])
         self.__headers = headers
         self.__setup()
-        
+
     def __setup(self):
         self.__name = self.__deviceDict[unicode("room_name")]
         self.__deviceId = self.__deviceDict[unicode("device_id")]
         self.__powerState = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0][unicode('power')]
 
-        self.__fanState = "high"
-        self.__modeState = "cool"
-        self.__swingState = "off"
-        self.__temperature = 27
+        self.__fanState = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0]['fan']
+        self.__modeState = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0]['mode']
+        self.__swingState = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0]['swing']
+        self.__temperature = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0]['temperature']
 
     def __name__(self):
         return self.__name
@@ -61,9 +64,7 @@ class Room(object):
             data['power'] = "on"
 
         print("{0}/IrDeployment".format(REST_URL))
-        print(data)
         response = requests.put("{0}/IrDeployment".format(REST_URL), data=data, verify=False, headers=self.__headers)
-        print(response.json())
 
     @property
     def mode(self):
@@ -75,7 +76,7 @@ class Room(object):
 
     @property
     def swing(self):
-        pass
+        return self.__swingState
 
     @swing.setter
     def swing(self):
@@ -83,8 +84,16 @@ class Room(object):
 
     @property
     def temperature(self):
-        pass
+        return self.__temperature
 
     @temperature.setter
     def temperature(self):
+        pass
+
+    @property
+    def fan(self):
+        return self.__fanState
+
+    @fan.setter
+    def fan(self):
         pass

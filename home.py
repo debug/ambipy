@@ -7,9 +7,6 @@ from constants import REST_URL
 
 DEBUG = False
 
-# TODO switch to constants
-# TODO auth file
-
 def log(msg):
     if DEBUG:
         print(msg)
