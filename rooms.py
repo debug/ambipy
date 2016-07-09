@@ -4,6 +4,8 @@ import home
 
 # TODO change to emum model
 # TODO add docstrings
+# TODO fix quotations
+
 '''
 https://rest.ambiclimate.com/IrDeployment
 button: power
@@ -17,32 +19,36 @@ temperature: 27
 
 class Modes(object):
     # I imagine there are other modes.. I just haven't seen them yet.
-    COOL = "Cool"
+    COOL = "cool"
 
 class Fan(object):
-    HIGH = "High"
-    LOW = "Low"
-    AUTO = "Auto"
+    HIGH = "high"
+    LOW = "low"
+    AUTO = "auto"
 
 class Swing(object):
-    AUTO = "Auto"
-    OFF = "Off"
+    AUTO = "auto"
+    OFF = "off"
 
 class Power(object):
-    OFF = "Off"
-    ON = "On"
+    OFF = "off"
+    ON = "on"
 
-'''
-Ambipy :: raw :: [{u'louver': None, u'power': u'Off', u'created_on': u'2016-07-09T05:46:48+00:00', u'fan': u'High', u'mode': u'Cool', u'swing': u'Off', u'temperature': 26}]
-Ambipy :: raw :: [{u'louver': u'Off', u'power': u'Off', u'created_on': u'2016-07-09T05:46:52+00:00', u'fan': u'Auto', u'mode': u'Cool', u'swing': u'Auto', u'temperature': 19}]
-Ambipy :: Payload :: {'temperature': 26, 'power': 'On', 'button': 'power', 'fan': 'High', 'mode': 'Cool', 'swing': u'Off', 'device_id': u'05D8FF393131573257198218'}
-'''
+class Comfort(object):
+    # Guesses at values probably wrong need more data points.
+    HOT = 2.0
+    TOO_WARM = 1.8
+    A_BIT_WARM = 1.6
+    COMFORTABLE = 1
+    A_BIT_COLD = 0.8
+    TOO_COLD = 0.6
+    FREEZING = 0.4
 
 class Room(object):
     def __init__(self, rawDeviceData, headers):
         self.__deviceDict = rawDeviceData
 
-        home.log("raw :: {0}".format(self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')]))
+        #home.log("raw :: {0}".format(self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')]))
         self.__headers = headers
         self.__setup()
 
@@ -93,6 +99,7 @@ class Room(object):
         home.log("Payload :: {0}".format(data))
         home.log("{0}/IrDeployment".format(REST_URL))
         response = requests.put("{0}/IrDeployment".format(REST_URL), data=data, verify=False, headers=self.__headers)
+        return True
 
     @property
     def mode(self):
@@ -118,17 +125,29 @@ class Room(object):
         home.log("{0}/IrDeployment".format(REST_URL))
         response = requests.put("{0}/IrDeployment".format(REST_URL), data=data, verify=False, headers=self.__headers)
 
-
     @property
     def temperature(self):
         return self.__temperature
 
     @temperature.setter
     def temperature(self, temperatureIn):
+        """
+        Allows user to set temperature.
+
+        Args:
+            temperatureIn `float`.
+
+        Returns:
+            `bool` For success state.
+
+        """
         if isinstance(temperatureIn, float) != True:
             raise ValueError
+            return False
         else:
-            print("this is correct")
+            data = {"quantity": "Temperature", "value": temperatureIn, "device_id": self.__deviceId}
+            response = requests.put("{0}/AbsoluteApplianceControlTarget".format(REST_URL), data=data, verify=False, headers=self.__headers)
+            return True
 
     @property
     def fan(self):

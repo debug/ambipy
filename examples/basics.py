@@ -12,10 +12,12 @@ user = User()
 home = Home(user)
 
 for room in home.rooms:
-    room.power = Power.ON
+
 #    room.swing == Swing.OFF
 #    print("Mode >>", room.mode)
 #    print("Power >>", room.power)
 #    print("Temp >>", room.temperature)
-    room.temperature = 20.6
+    # Tip: any operations such as temperature change, swing mode etc need to be performed before any power OFF action as these will switch the AC unit back on.
+    room.temperature = 21.0
+    room.power = Power.OFF
 #    print("Fan >>", room.fan)

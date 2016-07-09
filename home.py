@@ -36,7 +36,7 @@ class Home(object):
     @property
     def rooms(self):
         """
-        Returns a list of
+        Returns a list of room device objects.
 
         Args:
             None
