@@ -21,7 +21,7 @@ class Home(object):
         self.__setup()
 
     def __setup(self):
-        queryStr =  "{0}/UserCredential?email={1}&pwd={2}"".format(REST_URL, self.__userObj.email, self.__userObj.password)
+        queryStr =  "{0}/UserCredential?email={1}&pwd={2}".format(REST_URL, self.__userObj.email, self.__userObj.password)
         log(queryStr)
         response = requests.get(queryStr, verify=False)
         if response.json() != {}:

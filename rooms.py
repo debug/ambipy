@@ -2,7 +2,6 @@ from constants import REST_URL
 import requests
 import home
 
-# TODO change to emum model
 # TODO add docstrings
 
 class Modes(object):
@@ -36,28 +35,41 @@ class Room(object):
     def __init__(self, rawDeviceData, headers):
         self.__deviceDict = rawDeviceData
 
-        #home.log("raw :: {0}".format(self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')]))
+        home.log("raw :: {0}".format(self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')]))
         self.__headers = headers
         self.__setup()
 
     def __setup(self):
         self.__name = self.__deviceDict[unicode("room_name")]
         self.__deviceId = self.__deviceDict[unicode("device_id")]
-        self.__powerState = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0][unicode("power")]
+
+        rawPower = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0][unicode("power")]
+
+        if rawPower == "On":
+            self.__powerState = Power.ON
+        if rawPower == "Off":
+            self.__powerState = Power.OFF
+
+        self.__temperature = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["temperature"]
 
         rawMode = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["mode"]
         rawFan = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["fan"]
+        rawSwing = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["swing"]
 
         if rawFan == "Auto":
             self.__fanState = Fan.AUTO
         elif rawFan == "High":
             self.__fanState = Fan.HIGH
+        elif rawFan == "Low":
+            self.__fanState = Fan.LOW
 
         if rawMode == "Cool":
             self.__modeState = Modes.COOL
 
-        self.__swingState = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["swing"]
-        self.__temperature = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["temperature"]
+        if rawSwing == "Off":
+            self.__swingState = Swing.OFF
+        elif rawSwing == "Auto":
+            self.__swingState = Swing.AUTO
 
     def __name__(self):
         return self.__name
@@ -105,13 +117,14 @@ class Room(object):
     def swing(self, swingStateIn):
         if swingStateIn == Swing.OFF:
             self.__swingState = Swing.OFF
-        elif stateIn == Swing.AUTO:
+        elif swingStateIn == Swing.AUTO:
             self.__swingState = Swing.AUTO
 
-        data = {"button": "swing", "device_id": self.__deviceId, "fan": self.__fanState, "mode": self.__modeState, "swing": self.__swingState, "temperature": self.__temperature}
-        home.log("Payload ::", data)
+        data = {"button": "swing", "device_id": self.__deviceId, "fan": self.__fanState, "mode": self.__modeState, "swing": self.__swingState, "temperature": self.__temperature, "power": self.__powerState}
+        home.log("Payload :: {0}".format(data))
         home.log("{0}/IrDeployment".format(REST_URL))
         response = requests.put("{0}/IrDeployment".format(REST_URL), data=data, verify=False, headers=self.__headers)
+        return True
 
     @property
     def temperature(self):
@@ -142,14 +155,18 @@ class Room(object):
         return self.__fanState
 
     @fan.setter
-    def fan(self):
-        '''
-        button	fan
-        device_id	05D8FF393131573257198218
-        fan	low
-        mode	cool
-        power	on
-        swing	on
-        temperature	18
-        '''
-        pass
+    def fan(self, fanStateIn):
+        if fanStateIn == Fan.HIGH:
+            self.__fanState = Fan.HIGH
+        elif fanStateIn == Fan.LOW:
+            self.__fanState = Fan.LOW
+        elif fanStateIn == Fan.AUTO:
+            self.__fanState = Fan.AUTO
+        else:
+            raise ValueError
+
+        data = {"button": "fan", "device_id": self.__deviceId, "fan": self.__fanState, "mode": self.__modeState, "swing": self.__swingState, "temperature": self.__temperature, "power": self.__powerState}
+        home.log("Payload :: {0}".format(data))
+        home.log("{0}/IrDeployment".format(REST_URL))
+        response = requests.put("{0}/IrDeployment".format(REST_URL), data=data, verify=False, headers=self.__headers)
+        return True
