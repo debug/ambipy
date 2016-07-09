@@ -1,15 +1,18 @@
 import os
 import json
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.auth import HTTPDigestAuth
 from rooms import Room
 from constants import REST_URL
 
-DEBUG = False
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+DEBUG = True
 
 def log(msg):
     if DEBUG:
-        print(msg)
+        print("Ambipy :: {0}".format(msg))
 
 class Home(object):
 
@@ -22,18 +25,26 @@ class Home(object):
         log(queryStr)
         response = requests.get(queryStr, verify=False)
         if response.json() != {}:
-            pass
             self.__userObj.userId = response.json()['user_id']
             self.__userObj.tokenId = response.json()['token_id']
             self.__userObj.createdOn = response.json()['created_on']
 
             self.__headers = {"Authorization":"Bearer {0}".format(response.json()['token_id'])}
         else:
-            # TODO throw error
-            pass
+            raise Exception("User failed to login.")
 
     @property
     def rooms(self):
+        """
+        Returns a list of
+
+        Args:
+            None
+
+        Returns:
+            `list` of rooms.Room objects.
+
+        """
         roomsList = []
         queryStr = "{0}/User?expand=appliance%2Cdevice&user_id={1}".format(REST_URL, self.__userObj.userId)
         log(queryStr)
