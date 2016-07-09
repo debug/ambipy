@@ -4,18 +4,6 @@ import home
 
 # TODO change to emum model
 # TODO add docstrings
-# TODO fix quotations
-
-'''
-https://rest.ambiclimate.com/IrDeployment
-button: power
-device_id
-fan: high
-mode: cool
-power: off
-swing: off
-temperature: 27
-'''
 
 class Modes(object):
     # I imagine there are other modes.. I just haven't seen them yet.
@@ -55,10 +43,10 @@ class Room(object):
     def __setup(self):
         self.__name = self.__deviceDict[unicode("room_name")]
         self.__deviceId = self.__deviceDict[unicode("device_id")]
-        self.__powerState = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0][unicode('power')]
+        self.__powerState = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0][unicode("power")]
 
-        rawMode = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0]['mode']
-        rawFan = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0]['fan']
+        rawMode = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["mode"]
+        rawFan = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["fan"]
 
         if rawFan == "Auto":
             self.__fanState = Fan.AUTO
@@ -68,8 +56,8 @@ class Room(object):
         if rawMode == "Cool":
             self.__modeState = Modes.COOL
 
-        self.__swingState = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0]['swing']
-        self.__temperature = self.__deviceDict[unicode('appliances')][0][unicode('appliance_state')][unicode('data')][0]['temperature']
+        self.__swingState = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["swing"]
+        self.__temperature = self.__deviceDict[unicode("appliances")][0][unicode("appliance_state")][unicode("data")][0]["temperature"]
 
     def __name__(self):
         return self.__name
@@ -95,7 +83,7 @@ class Room(object):
         else:
             raise ValueError
 
-        data = {'button': 'power', 'power': self.__powerState, 'device_id': self.__deviceId, 'fan': self.__fanState, 'mode': self.__modeState, 'swing': self.__swingState, 'temperature': self.__temperature}
+        data = {"button": "power", "power": self.__powerState, "device_id": self.__deviceId, "fan": self.__fanState, "mode": self.__modeState, "swing": self.__swingState, "temperature": self.__temperature}
         home.log("Payload :: {0}".format(data))
         home.log("{0}/IrDeployment".format(REST_URL))
         response = requests.put("{0}/IrDeployment".format(REST_URL), data=data, verify=False, headers=self.__headers)
@@ -120,7 +108,7 @@ class Room(object):
         elif stateIn == Swing.AUTO:
             self.__swingState = Swing.AUTO
 
-        data = {'button': 'swing', 'device_id': self.__deviceId, 'fan': self.__fanState, 'mode': self.__modeState, 'swing': self.__swingState, 'temperature': self.__temperature}
+        data = {"button": "swing", "device_id": self.__deviceId, "fan": self.__fanState, "mode": self.__modeState, "swing": self.__swingState, "temperature": self.__temperature}
         home.log("Payload ::", data)
         home.log("{0}/IrDeployment".format(REST_URL))
         response = requests.put("{0}/IrDeployment".format(REST_URL), data=data, verify=False, headers=self.__headers)
@@ -155,4 +143,13 @@ class Room(object):
 
     @fan.setter
     def fan(self):
+        '''
+        button	fan
+        device_id	05D8FF393131573257198218
+        fan	low
+        mode	cool
+        power	on
+        swing	on
+        temperature	18
+        '''
         pass

@@ -21,15 +21,15 @@ class Home(object):
         self.__setup()
 
     def __setup(self):
-        queryStr =  '{0}/UserCredential?email={1}&pwd={2}'.format(REST_URL, self.__userObj.email, self.__userObj.password)
+        queryStr =  "{0}/UserCredential?email={1}&pwd={2}"".format(REST_URL, self.__userObj.email, self.__userObj.password)
         log(queryStr)
         response = requests.get(queryStr, verify=False)
         if response.json() != {}:
-            self.__userObj.userId = response.json()['user_id']
-            self.__userObj.tokenId = response.json()['token_id']
-            self.__userObj.createdOn = response.json()['created_on']
+            self.__userObj.userId = response.json()["user_id"]
+            self.__userObj.tokenId = response.json()["token_id"]
+            self.__userObj.createdOn = response.json()["created_on"]
 
-            self.__headers = {"Authorization":"Bearer {0}".format(response.json()['token_id'])}
+            self.__headers = {"Authorization":"Bearer {0}".format(response.json()["token_id"])}
         else:
             raise Exception("User failed to login.")
 
@@ -49,7 +49,7 @@ class Home(object):
         queryStr = "{0}/User?expand=appliance%2Cdevice&user_id={1}".format(REST_URL, self.__userObj.userId)
         log(queryStr)
         response = requests.get(queryStr, headers=self.__headers, verify=False)
-        for device in response.json()['devices']:
+        for device in response.json()["devices"]:
             roomObj = Room(device, self.__headers)
             roomsList.append(roomObj)
         return roomsList
@@ -71,12 +71,12 @@ class User(object):
     def __setup(self):
         authFile = os.path.join(os.path.split(__file__)[0], self.AUTH_JSON)
         if os.path.exists(authFile):
-            fh = open(authFile, 'r')
+            fh = open(authFile, "r")
             data = json.loads(fh.read())
             if data != {}:
                 log("Loading Auth file")
-                self.__email = data['email']
-                self.__password = data['password']
+                self.__email = data["email"]
+                self.__password = data["password"]
             fh.close()
 
     @property
